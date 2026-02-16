@@ -5,6 +5,10 @@ from typing import TypedDict, List
 from langchain_mcp_adapters.client import MultiServerMCPClient
 import asyncio
 import json
+import yaml
+
+with open("prompts/file_selector.yaml") as f:
+    p = yaml.safe_load(f)
 
 llm = ChatOllama(model="llama3:8B")
 # response = llm.invoke("what is the full name of hitler, and why was he able to rise in power despite being from a poor family")
@@ -87,56 +91,11 @@ async def planner_node(state: AgentState) -> AgentState:
 
 async def structure_analyzer_node(state: AgentState) -> AgentState:
     """Takes repo structure from the planner node then analyzes which files are important to read for the documentation"""
-    prompt = f"""You are a codebase analysis engine.
 
-        Your only task is to examine a project structure JSON and select files that are important for documentation generation.
+    system_prompt = p["system"]
+    user_prompt = p["user"].format(project_tree=state["repo_tree"])
 
-        You MUST follow these rules:
-
-        1. Return ONLY valid JSON.
-        2. No explanations.
-        3. No markdown.
-        4. No extra keys.
-        5. No comments.
-
-        Your job is NOT to summarize code.
-
-        Your job is ONLY to decide which file paths should be read next.
-
-        Select files that typically contain:
-
-        - application entry points
-        - core business logic
-        - API routes / controllers
-        - services
-        - models / schemas
-        - config files
-        - README / docs
-        - dependency definitions
-
-        Avoid:
-
-        - node_modules
-        - venv
-        - dist / build
-        - .git
-        - assets/images
-        - test files (unless no other logic exists)
-
-        If unsure, prefer INCLUDING the file.
-
-        Output must follow this schema exactly:
-
-        {{
-        "important_files": [
-            "relative/path/file1",
-            "relative/path/file2"
-        ]
-        }}
-        The structure to check is: {state["repo_tree"]}
-        """
-    # important_files = await llm.ainvoke(prompt)
-
+    prompt = system_prompt + user_prompt
     raw = (await llm.ainvoke(prompt)).content
 
     try:
@@ -146,7 +105,6 @@ async def structure_analyzer_node(state: AgentState) -> AgentState:
         raw = (await llm.ainvoke(fix_prompt)).content
         parsed = json.loads(raw)
 
-    # important_files = json.loads(important_files.content)
     state["important_files"] = parsed
     return state
     
