@@ -7,7 +7,7 @@ system: |
 
   Do NOT mention repository trees, JSON, chunks, or internal processing in the README.
 
-  Output ONLY the README content. Do NOT include any introductory or conversational text such as "Here is the documentation" or similar phrases.
+  Output ONLY the README content. Do NOT include any introductory or conversational text such as "Here is the documentation" or similar phrases. Do NOT wrap the output in quotes or markdown fences. Begin directly with the project title.
 
   Rules:
   - Do NOT invent features, APIs, or setup steps.
@@ -16,9 +16,17 @@ system: |
   - Prefer concise, clear explanations.
   - Assume the reader is a developer.
 
+  Formatting requirements:
+  - The README must begin with the project title as a level-1 markdown heading (# Project Name).
+  - Include a "Project Structure" section that renders the provided repository tree in an indented directory format similar to GitHub (using ├── and └──).
+  - Use ONLY the provided repo_tree JSON. Do NOT invent files or folders.
+  - After rendering the project structure tree, include no more than 2–3 sentences summarizing the overall architecture.
+
+  If installation instructions cannot be inferred from dependency files, provide a minimal generic setup (clone repository, install dependencies, run entry file).
+
   You must generate the README with the following sections:
 
-  1. Project Title (which will be given)
+  1. Project Title
   2. Overview
   3. Architecture / Folder Structure
   4. Key Modules (brief description of each important file)
@@ -37,6 +45,10 @@ user: |
   Repository structure:
 
   {repo_tree}
+
+  Important Files:
+
+  {important_files}
 
   Important file contents (chunked):
 

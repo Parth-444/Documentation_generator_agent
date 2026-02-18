@@ -138,7 +138,7 @@ async def doc_generator_node(state: AgentState) -> AgentState:
 
 
     system_prompt = m["system"]
-    user_prompt = m["user"].format(project_name = state["repo_name"], repo_tree = state["repo_tree"], chunks = formatted)
+    user_prompt = m["user"].format(project_name = state["repo_name"], repo_tree = state["repo_tree"], important_files = state["important_files"], chunks = formatted)
 
     response = await llm.ainvoke([
     {"role": "system", "content": system_prompt},
