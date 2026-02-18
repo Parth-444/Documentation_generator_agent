@@ -6,10 +6,14 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import asyncio
 import json
+from collections import defaultdict
 import yaml
 
 with open("prompts/file_selector.yaml") as f:
     p = yaml.safe_load(f)
+
+with open("prompts/documentation_generator.yaml") as f:
+    m = yaml.safe_load(f)
 
 llm = ChatOllama(model="llama3:8B")
 
@@ -43,40 +47,14 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap = 
 
 class AgentState(TypedDict):
 
-    messages: str
     repo_name : str | None
     repo_tree: List
     important_files : List
     chunks: List
+    documentation: str
 
 async def planner_node(state: AgentState) -> AgentState:
     """Takes the repo name then gets the repo tree from MCP server"""
-#     list_all_repos = await list_repos_tool.ainvoke({})
-    
-#     fuzzy_match = await llm.ainvoke(f"""You are given a list of GitHub repository names: {list_all_repos}
-# The user provided this repo name: {state['repo_name']}
-
-# Your task is to find the single best matching repository name from the list.
-
-# Match based on:
-
-# semantic similarity
-
-# partial words
-
-# hyphens vs spaces
-
-# abbreviations
-
-# casing differences
-
-# Return only the exact repository name from the list.
-# If no reasonable match exists, return "NOT_FOUND".
-
-# Do not explain your reasoning. Output only the repo name.""")
-    
-    # resolved_repo = fuzzy_match.content.strip()
-    # state["repo_name"] = resolved_repo
 
     repo_tree = await repo_tree_tool.ainvoke({"repo_name": state["repo_name"]})
     state["repo_tree"] = repo_tree
@@ -144,6 +122,34 @@ async def file_loader_node(state: AgentState) -> AgentState:
     return state
 
 
+async def doc_generator_node(state: AgentState) -> AgentState:
+
+    grouped = defaultdict(list)
+
+    for c in state["chunks"]:
+        grouped[c["path"]].append(c["content"])
+
+    formatted = ""
+
+    for path in sorted(grouped):
+        parts = grouped[path]
+        formatted += f"\n\n=== File: {path} ===\n\n"
+        formatted += "\n".join(parts)
+
+
+    system_prompt = m["system"]
+    user_prompt = m["user"].format(project_name = state["repo_name"], repo_tree = state["repo_tree"], chunks = formatted)
+
+    response = await llm.ainvoke([
+    {"role": "system", "content": system_prompt},
+    {"role": "user", "content": user_prompt}
+        ])
+
+    raw = response.content
+
+    state["documentation"] = raw
+
+    return state
 
 
 
@@ -152,22 +158,30 @@ workflow = StateGraph(AgentState)
 workflow.add_node("planner_node", planner_node)
 workflow.add_node("structure_analyzer_node", structure_analyzer_node)
 workflow.add_node("file_loader_node", file_loader_node)
+workflow.add_node("doc_generator_node", doc_generator_node)
 
 workflow.add_edge(START, "planner_node")
 workflow.add_edge("planner_node", 'structure_analyzer_node')
 workflow.add_edge("structure_analyzer_node", "file_loader_node")
-
+workflow.add_edge("file_loader_node", "doc_generator_node")
 
 
 app = workflow.compile()
 
-initial_state = {
-    "messages": "",
-    "repo_name": "emotion-detection",
+
+if __name__ == "__main__":
+    initial_state = {
+    "repo_name": "Documentation_generator_agent",
     "repo_tree": [],
     "important_files": [],
-    "chunks": []
-}
+    "chunks": [],
+    "documentation": ""
+    }
+    result = asyncio.run(app.ainvoke(initial_state))
+    with open("output/readme.md", "w", encoding="utf-8") as file:
+        file.write(result["documentation"])
 
-result = asyncio.run(app.ainvoke(initial_state))
-print("Chunks: ", result["chunks"])
+
+
+
+

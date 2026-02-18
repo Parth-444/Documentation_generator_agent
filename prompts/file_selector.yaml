@@ -25,6 +25,13 @@ system: |
   - config files
   - README / docs
   - dependency definitions
+  
+  Always include dependency files such as:
+  - requirements.txt
+  - pyproject.toml
+  - setup.py
+  - package.json
+
 
   Avoid:
 
