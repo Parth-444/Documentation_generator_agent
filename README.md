@@ -1,34 +1,45 @@
-**Project Title:** Documentation_generator_agent
+# Documentation_generator_agent
 
-**Overview:**
-This repository contains an agent for generating documentation based on a given project structure.
+The Documentation Generator Agent is a tool for generating documentation from a repository's file structure and important files.
 
-**Architecture / Folder Structure:**
+**Project Structure**
+```
+README.md
+LICENSE
+client.py
+output/
+readme.md
+prompts/
+documentation_generator.yaml
+file_selector.yaml
+requirements.txt
+```
 
-The repository consists of several key files and folders:
-- `client.py`: The main application file that runs the documentation generation process.
-- `output`: A folder containing generated documentation files, including this README.md file.
-- `prompts`: A folder containing YAML configuration files for the documentation generator.
+The project architecture is designed to analyze the repository structure, identify important files, and generate documentation based on those files. The workflow consists of four nodes: planner, structure analyzer, file loader, and doc generator.
 
-**Key Modules:**
-- `planner_node`: Initializes the documentation generation process by planning the node structure.
-- `structure_analyzer_node`: Analyzes the project structure and extracts important files.
-- `file_loader_node`: Loads important files into chunks, splitting them if necessary.
-- `doc_generator_node`: Generates documentation based on the loaded file chunks.
+**Key Modules**
 
-**Installation:**
-Not specified in repository. Please refer to individual package installation instructions or a CI/CD pipeline setup.
+* `client.py`: The main entry point for the application.
+* `documentation_generator.yaml` and `file_selector.yaml`: Configuration files used by the tool to determine which files are important and how to generate documentation.
+* `requirements.txt`: A list of dependencies required by the project.
 
-**Usage:**
-The agent can be run as a standalone application using the `client.py` script. The output will include generated documentation files in the `output` folder.
+**Installation**
+To use this tool, you will need to install the required dependencies. You can do this by running the following command:
+```
+pip install -r requirements.txt
+```
 
-**Configuration:**
-The agent is configured through YAML files in the `prompts` folder, specifically:
-- `documentation_generator.yaml`: Defines the project structure and important files.
-- `file_selector.yaml`: Selects which files are important for generating documentation.
+**Usage**
 
-**Contributing:**
-This repository accepts contributions to improve its functionality, maintainability, or readability. Please create an issue or pull request to discuss your ideas.
+1. Clone the repository and navigate to its root directory.
+2. Run `client.py` using your preferred Python runtime.
 
-**Reporting Issues:**
-If you encounter any issues while using the agent, please report them on this repository's issue tracker.
+**Configuration**
+
+No configuration is required for this tool. The important files and their contents are used as-is to generate documentation.
+
+**Contributing**
+If you'd like to contribute to this project, please submit a pull request with your changes.
+
+**Reporting Issues**
+If you encounter any issues while using this tool, please report them by creating an issue on this repository's issue tracker.
