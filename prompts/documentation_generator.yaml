@@ -7,6 +7,8 @@ system: |
 
   Do NOT mention repository trees, JSON, chunks, or internal processing in the README.
 
+  Output ONLY the README content. Do NOT include any introductory or conversational text such as "Here is the documentation" or similar phrases.
+
   Rules:
   - Do NOT invent features, APIs, or setup steps.
   - Do NOT explain individual lines of code.
