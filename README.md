@@ -1,44 +1,34 @@
-# Documentation_generator_agent
-## Project Overview
+**Project Title:** Documentation_generator_agent
 
-The Documentation_generator_agent is a codebase analysis engine that analyzes a project structure JSON and selects files that are important for documentation generation. The system must follow specific rules to output valid JSON, exclude unnecessary files, and include only relevant files.
+**Overview:**
+This repository contains an agent for generating documentation based on a given project structure.
 
-## Architecture / Folder Structure
+**Architecture / Folder Structure:**
 
-The repository contains the following important files:
-* `client.py`: The main script that runs the codebase analysis engine.
-* `prompts/file_selector.yaml`: A YAML file that defines the system prompts for selecting important files.
-* `requirements.txt`: A list of dependencies required to run the project.
+The repository consists of several key files and folders:
+- `client.py`: The main application file that runs the documentation generation process.
+- `output`: A folder containing generated documentation files, including this README.md file.
+- `prompts`: A folder containing YAML configuration files for the documentation generator.
 
-## Key Modules
+**Key Modules:**
+- `planner_node`: Initializes the documentation generation process by planning the node structure.
+- `structure_analyzer_node`: Analyzes the project structure and extracts important files.
+- `file_loader_node`: Loads important files into chunks, splitting them if necessary.
+- `doc_generator_node`: Generates documentation based on the loaded file chunks.
 
-### `planner_node`
-This module takes the repo name as input and gets the repo tree from the MCP server. It then uses this information to plan the documentation generation workflow.
+**Installation:**
+Not specified in repository. Please refer to individual package installation instructions or a CI/CD pipeline setup.
 
-### `structure_analyzer_node`
-This module analyzes the repo structure to determine which files are important for documentation generation. It uses the system prompts to select relevant files.
+**Usage:**
+The agent can be run as a standalone application using the `client.py` script. The output will include generated documentation files in the `output` folder.
 
-### `file_loader_node`
-This module loads the important files into chunks based on their content and size.
+**Configuration:**
+The agent is configured through YAML files in the `prompts` folder, specifically:
+- `documentation_generator.yaml`: Defines the project structure and important files.
+- `file_selector.yaml`: Selects which files are important for generating documentation.
 
-## Installation
+**Contributing:**
+This repository accepts contributions to improve its functionality, maintainability, or readability. Please create an issue or pull request to discuss your ideas.
 
-To run this project, you will need to install the dependencies listed in `requirements.txt`. You can do this using pip:
-```
-pip install -r requirements.txt
-```
-## Usage
-
-Run the main script, `client.py`, with the required inputs (e.g., repo name) to generate the documentation.
-
-## Configuration
-
-Not specified in repository.
-
-## Contributing
-
-If you would like to contribute to this project, please reach out to the maintainers or create an issue on GitHub.
-
-## Reporting Issues
-
-To report any issues or bugs, please submit a new issue on GitHub.
+**Reporting Issues:**
+If you encounter any issues while using the agent, please report them on this repository's issue tracker.
