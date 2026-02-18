@@ -2,38 +2,55 @@
 Overview
 --------
 
-The Documentation Generator Agent is a system designed to generate documentation for GitHub repositories based on their structure and important files. It uses various components, including LangGraph, MCP, and LLM (Large Language Model), to analyze the repository's file structure and content, identify key modules and files, and generate documentation in markdown format.
+The Documentation Generator Agent is a system that generates documentation for GitHub repositories. It uses natural language processing (NLP) and machine learning (ML) techniques to analyze the repository structure, identify important files, and generate documentation in Markdown format.
 
 Architecture / Folder Structure
-------------------------------
+-----------------------------
 
-The system consists of several folders and files:
-
-*   `client.py`: The main entry point for the system, responsible for initializing the workflow and invoking the various nodes.
-*   `prompts/` directory: Contains YAML files defining prompts for the LLM to use in generating documentation. Specifically:
-    +   `file_selector.yaml`: Defines a prompt to select important files from the repository.
-    +   `documentation_generator.yaml`: Defines a prompt to generate documentation based on the selected files and their contents.
-*   `output/` directory: Contains the generated documentation in markdown format.
+    README.md
+    LICENSE
+    client.py
+    output/
+        readme.md
+    prompts/
+        documentation_generator.yaml
+        file_selector.yaml
+    requirements.txt
 
 Key Modules
--------------
+------------
 
-The system has several key modules:
-
-1.  **Planner Node**: Analyzes the repository's file structure and identifies important files.
-2.  **Structure Analyzer Node**: Analyzes the selected files' contents to determine their relevance to the documentation.
-3.  **File Loader Node**: Loads the identified files into chunks for processing.
-4.  **Documentation Generator Node**: Generates documentation based on the processed file contents.
+* `client.py`: The main entry point of the system, which coordinates the workflow and runs the different nodes.
+* `planner_node`: Analyzes the repository structure to identify important files and determine the order in which they should be processed.
+* `structure_analyzer_node`: Analyzes the important files to identify their contents and extract relevant information.
+* `file_loader_node`: Loads the important files into chunks, which are then used by the documentation generator.
+* `doc_generator_node`: Generates the documentation from the chunks using natural language processing (NLP) techniques.
 
 Installation
 ------------
 
-To use this system, follow these steps:
-
-1.  Clone the repository: `git clone https://github.com/Parth-444/Documentation_generator_agent.git`
-2.  Install dependencies: `pip install -r requirements.txt`
+1. Clone the repository: `git clone https://github.com/Parth-444/Documentation_generator_agent.git`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run the main entry point: `python client.py`
 
 Usage
 -----
 
-Run the main entry point: `python client.py`
+The system can be run from the command line by executing `python client.py`. This will generate the documentation for the repository and save it to the `output/readme.md` file.
+
+External Dependencies
+-------------------
+
+* LangGraph: A library for natural language processing (NLP) tasks.
+* Ollama: An open-source LLaMA model for text generation.
+* MCP: A multi-server client for interacting with multiple servers concurrently.
+
+Configuration
+-------------
+
+The system can be configured by modifying the `prompts` directory, which contains YAML files that define the prompts used in the NLP tasks. The `documentation_generator.yaml` file defines the prompt used to generate documentation, while the `file_selector.yaml` file defines the prompt used to select important files.
+
+Contributing
+------------
+
+Contributions are welcome! If you'd like to contribute to this project, please fork the repository and submit a pull request with your changes.

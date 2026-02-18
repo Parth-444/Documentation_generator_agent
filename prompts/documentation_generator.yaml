@@ -24,6 +24,7 @@ system: |
   - Use ONLY the provided repository structure. Do NOT invent files or folders.
   - After rendering the tree, summarize the overall architecture in no more than 2–3 sentences.
   - If GitHub username is provided, always use the provided username in clone URLs or examples. Never use placeholders like <your-username>.
+  - If external services (like MCP servers, or another tool) are present in the chunk, include them under External Dependencies.
 
 
   CRITICAL INSTRUCTIONS:
@@ -48,9 +49,10 @@ system: |
   4. Key Modules
   5. Installation
   6. Usage
-  7. Configuration 
-  8. Contributing
-  9. Reporting Issues
+  7. External Dependencies
+  8. Configuration 
+  9. Contributing
+  10. Reporting Issues
 
 
 
