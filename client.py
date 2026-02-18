@@ -17,6 +17,7 @@ with open("prompts/documentation_generator.yaml") as f:
 
 llm = ChatOllama(model="llama3:8B")
 
+
 async def get_mcp_tools():
     client = MultiServerMCPClient(
     {
@@ -39,6 +40,7 @@ async def get_mcp_tools():
 tools = asyncio.run(get_mcp_tools())
 
 # llm_with_tools = llm.bind_tools(tools)
+get_username_tool = next(t for t in tools if t.name == "get_username")
 repo_tree_tool = next(t for t in tools if t.name == "get_repo_tree")
 list_repos_tool = next(t for t in tools if t.name == "list_repos")
 get_file_content_tool = next(t for t in tools if t.name == "get_file_content")
@@ -60,6 +62,7 @@ async def planner_node(state: AgentState) -> AgentState:
     state["repo_tree"] = repo_tree
     return state
 
+
 async def structure_analyzer_node(state: AgentState) -> AgentState:
     """Takes repo structure from the planner node then analyzes which files are important to read for the documentation"""
 
@@ -79,8 +82,6 @@ async def structure_analyzer_node(state: AgentState) -> AgentState:
     state["important_files"] = parsed["important_files"]
     return state
     
-
-
 
 async def file_loader_node(state: AgentState) -> AgentState:
     """Takes path for important files and loads them into chunks"""
@@ -136,9 +137,13 @@ async def doc_generator_node(state: AgentState) -> AgentState:
         formatted += f"\n\n=== File: {path} ===\n\n"
         formatted += "\n".join(parts)
 
+    user_name = await get_username_tool.ainvoke({})
 
     system_prompt = m["system"]
-    user_prompt = m["user"].format(project_name = state["repo_name"], repo_tree = state["repo_tree"], important_files = state["important_files"], chunks = formatted)
+    user_prompt = m["user"].format(username = user_name, project_name = state["repo_name"],
+                                    repo_tree = state["repo_tree"],
+                                    important_files = state["important_files"],
+                                    chunks = formatted)
 
     response = await llm.ainvoke([
     {"role": "system", "content": system_prompt},
@@ -150,7 +155,6 @@ async def doc_generator_node(state: AgentState) -> AgentState:
     state["documentation"] = raw
 
     return state
-
 
 
 workflow = StateGraph(AgentState)
