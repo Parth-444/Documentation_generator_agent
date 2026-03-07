@@ -60,7 +60,6 @@ Upon successful execution, the generated documentation will be saved to the `out
 
 *   **LangGraph**: A library used for building stateful, multi-actor applications with LLMs. It defines and manages the agent's workflow, orchestrating the sequence of nodes for planning, analysis, loading, and documentation generation.
 *   **ChatGoogleGenerativeAI**: The LLM client utilized in `client.py` with the "gemini-2.5-flash" model for intelligently selecting important files and generating the final Markdown documentation.
-*   **Ollama**: An open-source framework for running Large Language Models locally. The provided `README.md` indicates it provides the `llama3:8B` model, which is utilized for both intelligently selecting important files and generating the final Markdown documentation (though `client.py` explicitly uses `ChatGoogleGenerativeAI`).
 *   **MCP (MultiServerMCPClient)**: A multi-server client library that enables the system to interact with external services concurrently. In this project, it is configured to communicate with a `github_server` to retrieve repository trees, file contents, and user information necessary for documentation.
 
 ## Configuration
