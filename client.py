@@ -1,6 +1,4 @@
 from langgraph.graph import StateGraph, START
-from langchain.tools import tool
-from langchain_ollama import ChatOllama
 from typing import TypedDict, List
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -20,7 +18,6 @@ with open("prompts/file_selector.yaml") as f:
 with open("prompts/documentation_generator.yaml") as f:
     m = yaml.safe_load(f)
 
-# llm = ChatOllama(model="llama3:8B")
 llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=key)
 
 
@@ -55,7 +52,6 @@ async def get_mcp_tools():
 
 tools = asyncio.run(get_mcp_tools())
 
-# llm_with_tools = llm.bind_tools(tools)
 get_username_tool = next(t for t in tools if t.name == "get_username")
 repo_tree_tool = next(t for t in tools if t.name == "get_repo_tree")
 list_repos_tool = next(t for t in tools if t.name == "list_repos")
