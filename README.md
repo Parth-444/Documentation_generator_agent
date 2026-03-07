@@ -25,11 +25,11 @@ The project is structured around `client.py`, which orchestrates the documentati
 
 ## Key Modules
 
-*   `client.py`: The main entry point of the system, which coordinates the workflow and runs the different nodes of the LangGraph agent. It initializes the LLM, MCP client, and defines the agent's state and workflow.
+*   `client.py`: The main entry point of the system, which coordinates the workflow and runs the different nodes of the LangGraph agent. It initializes the LLM (using `ChatGoogleGenerativeAI`), MCP client, and defines the agent's state and workflow.
 *   `planner_node`: The initial node in the agent pipeline. It takes the repository name and retrieves the repository tree from the GitHub MCP server, setting up the context for subsequent analysis.
-*   `structure_analyzer_node`: Receives the repository structure from the `planner_node`. It utilizes an LLM, guided by the `file_selector.yaml` prompt, to analyze the tree and identify which files are most important for generating comprehensive documentation.
+*   `structure_analyzer_node`: Receives the repository structure from the `planner_node`. It utilizes an LLM (specifically `ChatGoogleGenerativeAI` with structured output), guided by the `file_selector.yaml` prompt, to analyze the tree and identify which files are most important for generating comprehensive documentation.
 *   `file_loader_node`: Takes the paths of the identified important files. It fetches their content from the GitHub MCP server and then splits the content into manageable chunks using `RecursiveCharacterTextSplitter` for efficient processing by the documentation generator.
-*   `doc_generator_node`: The final node responsible for generating the documentation. It aggregates the loaded file chunks, uses an LLM (guided by the `documentation_generator.yaml` prompt) to synthesize a professional `README.md`, and incorporates other repository metadata like the username.
+*   `doc_generator_node`: The final node responsible for generating the documentation. It aggregates the loaded file chunks, uses an LLM (specifically `ChatGoogleGenerativeAI`, guided by the `documentation_generator.yaml` prompt) to synthesize a professional `README.md`, and incorporates other repository metadata like the username fetched from the MCP server.
 
 ## Installation
 
@@ -42,12 +42,13 @@ The project is structured around `client.py`, which orchestrates the documentati
     ```bash
     pip install -r requirements.txt
     ```
-3.  Ensure your Ollama server is running and the `llama3:8B` model is available.
-4.  Ensure the MCP GitHub server is configured and accessible as specified in `client.py`.
+3.  Ensure your Ollama server is running and the `llama3:8B` model is available (as specified in the original README, though the `client.py` uses `gemini-2.5-flash`).
+4.  Ensure the MCP GitHub server is configured and accessible as specified in `client.py` (e.g., `C:\Users\Parth\Desktop\github_mcp_server\main.py`).
+5.  Set your `GOOGLE_API_KEY` as an environment variable for `ChatGoogleGenerativeAI` usage.
 
 ## Usage
 
-The system can be run from the command line by executing the main client script. This will initiate the documentation generation process for the specified repository.
+The system can be run from the command line by executing the main client script. This will initiate the documentation generation process for the specified repository (defaulting to "Documentation_generator_agent").
 
 ```bash
 python client.py
@@ -58,7 +59,8 @@ Upon successful execution, the generated documentation will be saved to the `out
 ## External Dependencies
 
 *   **LangGraph**: A library used for building stateful, multi-actor applications with LLMs. It defines and manages the agent's workflow, orchestrating the sequence of nodes for planning, analysis, loading, and documentation generation.
-*   **Ollama**: An open-source framework for running Large Language Models locally. It provides the `llama3:8B` model, which is utilized for both intelligently selecting important files and generating the final Markdown documentation.
+*   **ChatGoogleGenerativeAI**: The LLM client utilized in `client.py` with the "gemini-2.5-flash" model for intelligently selecting important files and generating the final Markdown documentation.
+*   **Ollama**: An open-source framework for running Large Language Models locally. The provided `README.md` indicates it provides the `llama3:8B` model, which is utilized for both intelligently selecting important files and generating the final Markdown documentation (though `client.py` explicitly uses `ChatGoogleGenerativeAI`).
 *   **MCP (MultiServerMCPClient)**: A multi-server client library that enables the system to interact with external services concurrently. In this project, it is configured to communicate with a `github_server` to retrieve repository trees, file contents, and user information necessary for documentation.
 
 ## Configuration
