@@ -1,56 +1,77 @@
 # Documentation_generator_agent
-Overview
---------
 
-The Documentation Generator Agent is a system that generates documentation for GitHub repositories. It uses natural language processing (NLP) and machine learning (ML) techniques to analyze the repository structure, identify important files, and generate documentation in Markdown format.
+## Overview
 
-Architecture / Folder Structure
------------------------------
+The `Documentation_generator_agent` is an automated system designed to generate professional `README.md` documentation for GitHub repositories. It addresses the challenge of manually creating comprehensive documentation by leveraging an intelligent, multi-step AI agent pipeline built with LangGraph.
 
-    README.md
-    LICENSE
-    client.py
-    output/
-        readme.md
-    prompts/
-        documentation_generator.yaml
-        file_selector.yaml
-    requirements.txt
+The system operates by first taking a repository name as input. It then interacts with a GitHub server via a Multi-Server Client Protocol (MCP) to obtain the repository's file tree. A Large Language Model (LLM) subsequently analyzes this structure to identify files critical for documentation. The content of these important files is then loaded, chunked, and fed into another LLM, which synthesizes a comprehensive `README.md` based on predefined prompts and the extracted repository context. This end-to-end workflow automates the documentation process, providing a structured and context-aware output.
 
-Key Modules
-------------
+## Architecture / Folder Structure
 
-* `client.py`: The main entry point of the system, which coordinates the workflow and runs the different nodes.
-* `planner_node`: Analyzes the repository structure to identify important files and determine the order in which they should be processed.
-* `structure_analyzer_node`: Analyzes the important files to identify their contents and extract relevant information.
-* `file_loader_node`: Loads the important files into chunks, which are then used by the documentation generator.
-* `doc_generator_node`: Generates the documentation from the chunks using natural language processing (NLP) techniques.
+```
+.
+├── LICENSE
+├── README.md
+├── client.py
+├── output/
+│   └── readme.md
+├── prompts/
+│   ├── documentation_generator.yaml
+│   └── file_selector.yaml
+└── requirements.txt
+```
 
-Installation
-------------
+The project is structured around `client.py`, which orchestrates the documentation generation workflow. Configuration for the LLM prompts is stored in the `prompts/` directory, and the generated documentation is saved in `output/`. This modular design separates the core logic from configuration and output.
 
-1. Clone the repository: `git clone https://github.com/Parth-444/Documentation_generator_agent.git`
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run the main entry point: `python client.py`
+## Key Modules
 
-Usage
------
+*   `client.py`: The main entry point of the system, which coordinates the workflow and runs the different nodes of the LangGraph agent. It initializes the LLM, MCP client, and defines the agent's state and workflow.
+*   `planner_node`: The initial node in the agent pipeline. It takes the repository name and retrieves the repository tree from the GitHub MCP server, setting up the context for subsequent analysis.
+*   `structure_analyzer_node`: Receives the repository structure from the `planner_node`. It utilizes an LLM, guided by the `file_selector.yaml` prompt, to analyze the tree and identify which files are most important for generating comprehensive documentation.
+*   `file_loader_node`: Takes the paths of the identified important files. It fetches their content from the GitHub MCP server and then splits the content into manageable chunks using `RecursiveCharacterTextSplitter` for efficient processing by the documentation generator.
+*   `doc_generator_node`: The final node responsible for generating the documentation. It aggregates the loaded file chunks, uses an LLM (guided by the `documentation_generator.yaml` prompt) to synthesize a professional `README.md`, and incorporates other repository metadata like the username.
 
-The system can be run from the command line by executing `python client.py`. This will generate the documentation for the repository and save it to the `output/readme.md` file.
+## Installation
 
-External Dependencies
--------------------
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/Parth-444/Documentation_generator_agent.git
+    cd Documentation_generator_agent
+    ```
+2.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+3.  Ensure your Ollama server is running and the `llama3:8B` model is available.
+4.  Ensure the MCP GitHub server is configured and accessible as specified in `client.py`.
 
-* LangGraph: A library for natural language processing (NLP) tasks.
-* Ollama: An open-source LLaMA model for text generation.
-* MCP: A multi-server client for interacting with multiple servers concurrently.
+## Usage
 
-Configuration
--------------
+The system can be run from the command line by executing the main client script. This will initiate the documentation generation process for the specified repository.
 
-The system can be configured by modifying the `prompts` directory, which contains YAML files that define the prompts used in the NLP tasks. The `documentation_generator.yaml` file defines the prompt used to generate documentation, while the `file_selector.yaml` file defines the prompt used to select important files.
+```bash
+python client.py
+```
 
-Contributing
-------------
+Upon successful execution, the generated documentation will be saved to the `output/readme.md` file within the repository.
+
+## External Dependencies
+
+*   **LangGraph**: A library used for building stateful, multi-actor applications with LLMs. It defines and manages the agent's workflow, orchestrating the sequence of nodes for planning, analysis, loading, and documentation generation.
+*   **Ollama**: An open-source framework for running Large Language Models locally. It provides the `llama3:8B` model, which is utilized for both intelligently selecting important files and generating the final Markdown documentation.
+*   **MCP (MultiServerMCPClient)**: A multi-server client library that enables the system to interact with external services concurrently. In this project, it is configured to communicate with a `github_server` to retrieve repository trees, file contents, and user information necessary for documentation.
+
+## Configuration
+
+The system's behavior, particularly regarding LLM interactions, can be configured by modifying the YAML files located in the `prompts` directory:
+
+*   `documentation_generator.yaml`: Defines the system and user prompts used by the `doc_generator_node` to guide the LLM in generating the final `README.md` content.
+*   `file_selector.yaml`: Defines the system and user prompts used by the `structure_analyzer_node` to instruct the LLM on how to identify and select important files from the repository structure.
+
+## Contributing
 
 Contributions are welcome! If you'd like to contribute to this project, please fork the repository and submit a pull request with your changes.
+
+## Reporting Issues
+
+Not specified in repository

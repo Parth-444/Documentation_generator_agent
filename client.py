@@ -4,10 +4,15 @@ from langchain_ollama import ChatOllama
 from typing import TypedDict, List
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_google_genai import ChatGoogleGenerativeAI
+from pydantic import BaseModel, Field
 import asyncio
 import json
 from collections import defaultdict
 import yaml
+import os
+
+key = os.getenv("GOOGLE_API_KEY")
 
 with open("prompts/file_selector.yaml") as f:
     p = yaml.safe_load(f)
@@ -15,7 +20,18 @@ with open("prompts/file_selector.yaml") as f:
 with open("prompts/documentation_generator.yaml") as f:
     m = yaml.safe_load(f)
 
-llm = ChatOllama(model="llama3:8B")
+# llm = ChatOllama(model="llama3:8B")
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=key)
+
+
+class ImportantFiles(BaseModel):
+    """Schema for the list of important files selected for documentation."""
+    important_files: List[str] = Field(
+        description="List of relative file paths that are important for documentation generation."
+    )
+
+
+structured_llm = llm.with_structured_output(ImportantFiles)
 
 
 async def get_mcp_tools():
@@ -70,16 +86,9 @@ async def structure_analyzer_node(state: AgentState) -> AgentState:
     user_prompt = p["user"].format(project_tree=state["repo_tree"])
 
     prompt = system_prompt + user_prompt
-    raw = (await llm.ainvoke(prompt)).content
+    parsed: ImportantFiles = await structured_llm.ainvoke(prompt)
 
-    try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError:
-        fix_prompt = f"Fix this to valid JSON ONLY:\n{raw}"
-        raw = (await llm.ainvoke(fix_prompt)).content
-        parsed = json.loads(raw)
-
-    state["important_files"] = parsed["important_files"]
+    state["important_files"] = parsed.important_files
     return state
     
 
